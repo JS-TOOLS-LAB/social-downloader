@@ -1,0 +1,264 @@
+#!/bin/bash
+
+clear
+
+echo "==================================="
+echo "   Social Downloader v1.0"
+echo "==================================="
+echo ""
+echo "[1] Download Music (MP3)"
+echo "[2] Download Video (MP4)"
+echo "[3] Cookie Settings"
+echo "[4] About"
+echo "[5] Exit"
+echo ""
+read -p "Choice [1-5]: " choice
+
+case $choice in
+    1)
+        clear
+        echo "==================================="
+        echo "        Download Music (MP3)"
+        echo "==================================="
+        echo ""
+        echo "Supported: Facebook | TikTok | YouTube | Instagram | Twitter/X | Reddit | Twitch | Vimeo | Dailymotion | Bilibili | Likee | Snapchat"
+        echo ""
+        read -p "Paste URL: " url
+        
+        clear
+        echo "==================================="
+        echo "       Select Storage Location"
+        echo "==================================="
+        echo ""
+        echo "[1] /sdcard/JS-TOOLS-LAB"
+        echo "[2] $HOME/JS-TOOLS-LAB"
+        echo ""
+        read -p "Choice [1-2]: " storage_choice
+        
+        if [ $storage_choice -eq 1 ]; then
+            dir="/sdcard/JS-TOOLS-LAB"
+        else
+            dir="$HOME/JS-TOOLS-LAB"
+        fi
+        
+        mkdir -p "$dir"
+        cd "$dir"
+        
+        echo ""
+        echo "Downloading to: $dir"
+        yt-dlp -x --audio-format mp3 --audio-quality 0 -o "%(title)s.%(ext)s" "$url"
+        ;;
+        
+    2)
+        clear
+        echo "==================================="
+        echo "       Download Video (MP4)"
+        echo "==================================="
+        echo ""
+        echo "Supported: Facebook | TikTok | YouTube | Instagram | Twitter/X | Reddit | Twitch | Vimeo | Dailymotion | Bilibili | Likee | Snapchat"
+        echo ""
+        read -p "Paste URL: " url
+        
+        # Fetch available formats
+        clear
+        echo "Fetching video information..."
+        echo ""
+        
+        # Get format list with quality info
+        yt-dlp -F "$url" 2>/dev/null | grep -E "[0-9]+x[0-9]+" | grep -v "audio only" > /tmp/quality_list.txt
+        
+        if [ -s /tmp/quality_list.txt ]; then
+            echo "==================================="
+            echo "     Available Video Qualities"
+            echo "==================================="
+            echo ""
+            
+            # Display numbered qualities
+            line_num=1
+            declare -a format_codes
+            
+            while IFS= read -r line; do
+                # Extract resolution
+                res=$(echo "$line" | grep -oE "[0-9]+x[0-9]+" | head -1)
+                format_code=$(echo "$line" | awk '{print $1}')
+                format_codes[$line_num]=$format_code
+                
+                # Display nicely
+                if [ -n "$res" ]; then
+                    echo "[$line_num] $res"
+                else
+                    echo "[$line_num] Format $format_code"
+                fi
+                ((line_num++))
+            done < /tmp/quality_list.txt
+            
+            echo ""
+            echo "[0] Best quality (auto)"
+            echo ""
+            read -p "Choose quality [0-$((line_num-1))]: " quality_choice
+            
+            if [ "$quality_choice" -eq 0 ] 2>/dev/null; then
+                format_flag=""
+                echo ""
+                echo "Using: Best quality (auto)"
+            elif [ "$quality_choice" -ge 1 ] 2>/dev/null && [ "$quality_choice" -lt "$line_num" ]; then
+                selected_format=${format_codes[$quality_choice]}
+                format_flag="-f $selected_format"
+                echo ""
+                echo "Using: Format $selected_format"
+            else
+                format_flag=""
+                echo ""
+                echo "Invalid choice. Using best quality."
+            fi
+        else
+            echo "Could not fetch quality list. Using best quality."
+            format_flag=""
+        fi
+        
+        clear
+        echo "==================================="
+        echo "       Select Storage Location"
+        echo "==================================="
+        echo ""
+        echo "[1] /sdcard/JS-TOOLS-LAB"
+        echo "[2] $HOME/JS-TOOLS-LAB"
+        echo ""
+        read -p "Choice [1-2]: " storage_choice
+        
+        if [ $storage_choice -eq 1 ]; then
+            dir="/sdcard/JS-TOOLS-LAB"
+        else
+            dir="$HOME/JS-TOOLS-LAB"
+        fi
+        
+        mkdir -p "$dir"
+        cd "$dir"
+        
+        echo ""
+        echo "Downloading to: $dir"
+        
+        # Download with selected quality
+        if [ -n "$format_flag" ]; then
+            yt-dlp $format_flag --merge-output-format mp4 --remux-video mp4 -o "%(title)s.%(ext)s" "$url"
+        else
+            yt-dlp --merge-output-format mp4 --remux-video mp4 -S "vcodec:h264,res,acodec:aac" -o "%(title)s.%(ext)s" "$url"
+        fi
+        ;;
+        
+    3)
+        clear
+        echo "==================================="
+        echo "        Cookie Settings"
+        echo "==================================="
+        echo ""
+        echo "Cookies help download from: TikTok, Instagram, Twitter/X"
+        echo ""
+        echo "Note: Many TikTok videos work without cookies!"
+        echo ""
+        echo "Use cookies? (y/N): "
+        read -p "Default N: " use_cookies
+        
+        if [[ "$use_cookies" == "y" || "$use_cookies" == "Y" ]]; then
+            clear
+            echo "==================================="
+            echo "        Select Browser"
+            echo "==================================="
+            echo ""
+            echo "[1] Firefox"
+            echo "[2] Chrome"
+            echo "[3] Chromium"
+            echo "[4] Brave"
+            echo "[5] Edge"
+            echo "[6] Opera"
+            echo "[7] Vivaldi"
+            echo "[8] Safari (macOS only)"
+            echo "[9] Skip (use cookies.txt file)"
+            echo ""
+            read -p "Choice [1-9]: " browser_choice
+            
+            case $browser_choice in
+                1) browser="firefox" ;;
+                2) browser="chrome" ;;
+                3) browser="chromium" ;;
+                4) browser="brave" ;;
+                5) browser="edge" ;;
+                6) browser="opera" ;;
+                7) browser="vivaldi" ;;
+                8) browser="safari" ;;
+                9) browser="file" ;;
+                *) browser="" ;;
+            esac
+            
+            if [ "$browser" == "file" ]; then
+                echo ""
+                echo "Place cookies.txt in $HOME/"
+                echo "Export from browser extension (Netscape format)"
+                touch "$HOME/.smd_cookie_file"
+            elif [ -n "$browser" ]; then
+                echo "$browser" > "$HOME/.smd_cookie_browser"
+                echo ""
+                echo "Cookies enabled from: $browser"
+                echo "Make sure you're logged in first."
+            else
+                echo ""
+                echo "No browser selected. Cookies disabled."
+            fi
+        else
+            rm -f "$HOME/.smd_cookie_browser"
+            rm -f "$HOME/.smd_cookie_file"
+            echo ""
+            echo "Cookies disabled. Many videos work without them."
+        fi
+        
+        echo ""
+        read -p "Press Enter to continue..."
+        exec "$0"
+        ;;
+        
+    4)
+        clear
+        echo "==================================="
+        echo "              About"
+        echo "==================================="
+        echo ""
+        echo "Social Downloader v1.0"
+        echo ""
+        echo "Supported Platforms:"
+        echo "---------------------"
+        echo "Facebook, TikTok, YouTube, Instagram"
+        echo "Twitter/X, Reddit, Twitch, Vimeo"
+        echo "Dailymotion, Bilibili, Likee, Snapchat"
+        echo ""
+        echo "Features:"
+        echo "---------------------"
+        echo "- MP3 audio extraction"
+        echo "- MP4 video with quality selection"
+        echo "- Works on Termux/Android"
+        echo "- No cookies needed for most TikTok"
+        echo ""
+        echo "Requirements:"
+        echo "---------------------"
+        echo "- yt-dlp"
+        echo "- ffmpeg"
+        echo ""
+        read -p "Press Enter to return..."
+        exec "$0"
+        ;;
+        
+    5)
+        clear
+        echo "Goodbye!"
+        exit 0
+        ;;
+        
+    *)
+        echo "Invalid choice!"
+        sleep 1
+        exec "$0"
+        ;;
+esac
+
+echo ""
+read -p "Download complete! Press Enter for menu..."
+exec "$0"

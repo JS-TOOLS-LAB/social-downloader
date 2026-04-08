@@ -1,4 +1,3 @@
-```markdown
 # 🎬 Social Downloader
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -47,7 +46,7 @@
 
 ### Kali Linux
 
-```bash
+```markdown
 # Clone repository
 git clone https://github.com/JS-TOOLS-LAB/social-downloader.git
 cd social-downloader
@@ -61,7 +60,7 @@ sudo ./install.sh
 
 Termux/Android
 
-```bash
+```markdown
 # Update packages
 pkg update && pkg upgrade
 
@@ -81,7 +80,7 @@ chmod +x smd
 
 Manual Installation
 
-```bash
+```markdown
 # Install dependencies
 pip install yt-dlp
 sudo apt install ffmpeg -y  # Kali Linux
@@ -100,13 +99,13 @@ mv smd $PATH                # Termux
 
 Simply run the command:
 
-```bash
+```markdown
 smd
 ```
 
 Menu Options
 
-```
+```markdown
 ===================================
    Social Downloader v1.0
 ===================================
@@ -137,7 +136,7 @@ MP4 Download
 
 Quality Selection Example
 
-```
+```markdown
 ===================================
      Available Video Qualities
 ===================================
@@ -184,7 +183,7 @@ Setup Cookies
 
 Termux Cookie Method
 
-```bash
+```markdown
 # Export cookies from Android browser
 1. Install Cookie-Editor extension
 2. Log into website
@@ -195,7 +194,7 @@ Termux Cookie Method
 
 📁 Project Structure
 
-```
+```markdown
 social-downloader/
 ├── smd              # Main executable script
 ├── install.sh       # Installation script
@@ -208,7 +207,7 @@ social-downloader/
 
 Basic yt-dlp Commands
 
-```bash
+```markdown
 # Download best quality video
 yt-dlp --merge-output-format mp4 --remux-video mp4 -S "vcodec:h264,res,acodec:aac" "URL"
 
@@ -227,7 +226,7 @@ yt-dlp --cookies cookies.txt "URL"
 
 Advanced Options
 
-```bash
+```markdown
 # Download specific quality
 yt-dlp -f "best[height<=720]" "URL"
 
@@ -255,7 +254,7 @@ Permission denied (Termux) Grant storage permission: termux-setup-storage
 
 Debug Mode
 
-```bash
+```markdown
 # Run with verbose output
 bash -x smd
 
@@ -273,7 +272,7 @@ Full HD 1080p ~20 MB High quality
 
 🔄 Updates
 
-```bash
+```markdown
 # Update script
 cd social-downloader
 git pull
@@ -290,7 +289,7 @@ pkg update && pkg upgrade ffmpeg            # Termux
 
 Kali Linux
 
-```bash
+```markdown
 sudo rm /usr/local/bin/smd
 rm -rf ~/JS-TOOLS-LAB
 rm -rf social-downloader
@@ -298,7 +297,7 @@ rm -rf social-downloader
 
 Termux
 
-```bash
+```markdown
 rm $PREFIX/bin/smd
 rm -rf ~/JS-TOOLS-LAB
 rm -rf ~/social-downloader
@@ -354,4 +353,3 @@ Mr JV Sibanyoni
 <div align="center">
 Made with ❤️ by JS-TOOLS-LAB
 </div>
-```
